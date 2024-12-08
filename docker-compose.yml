@@ -1,0 +1,51 @@
+version: '3.9'
+
+name: "lesson6"
+
+services:
+  api:
+    image: levinvalentin/daru-java-pro:lesson6-api
+    container_name: "lesson6-api"
+    environment:
+      - MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_SHELTER_TOPIC_NAME=${KAFKA_SHELTER_TOPIC_NAME}
+      - KAFKA_SHELTER_PARTITION_COUNT=3
+      - KAFKA_SHELTER_REPLICATION_FACTOR=1
+    ports:
+      - "8080:8080"
+    restart: on-failure
+    healthcheck:
+      test: "wget --no-verbose --tries=1 --spider http://localhost:8080/lesson6/api/v1/actuator/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    image: levinvalentin/daru-java-pro:lesson6-shelter-data-worker
+    container_name: "lesson6-shelter-data-worker"
+    environment:
+      - MONGODB_AUTHENTICATION_DATABASE=${MONGODB_AUTHENTICATION_DATABASE}
+      - MONGODB_USERNAME=${MONGODB_USERNAME}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGODB_DATABASE=${MONGODB_DATABASE}
+      - MONGODB_HOST=${MONGODB_HOST}
+      - MONGODB_PORT=${MONGODB_PORT}
+
+      - KAFKA_BOOTSTRAP_SERVERS=${KAFKA_BOOTSTRAP_SERVERS}
+      - KAFKA_SHELTER_TOPIC_NAME=${KAFKA_SHELTER_TOPIC_NAME}
+      - KAFKA_SHELTER_DATA_GROUP_ID=shelter-data-group-id
+    restart: on-failure
+    healthcheck:
+      test: "wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      - api
