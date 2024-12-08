@@ -1,0 +1,15 @@
+spring:
+  main:
+    banner-mode: off
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:193.193.229.71:9092}
+    consumer:
+      group-id: ${KAFKA_SHELTER_DATA_GROUP_ID:shelter-data-group-id}
+  data:
+    mongodb:
+      authentication-database: ${MONGODB_AUTHENTICATION_DATABASE:shelter_database}
+      username: ${MONGODB_USERNAME:shelterDatabaseUser}
+      password: ${MONGODB_PASSWORD:e8anGQXUUQA2bc3tSd1N}
+      database: ${MONGODB_DATABASE:shelter_database}
+      host: ${MONGODB_HOST:193.193.229.71}
+      port: ${MONGODB_PORT:27017}
